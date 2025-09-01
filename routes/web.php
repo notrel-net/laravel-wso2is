@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Wso2is\Http\Controllers\CallbackController;
+use Donmbelembe\LaravelWso2is\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,5 +13,7 @@ use Laravel\Wso2is\Http\Controllers\CallbackController;
 */
 
 Route::group(['prefix' => 'wso2is', 'middleware' => ['web']], function () {
-    Route::get('callback', [CallbackController::class, 'handle'])->name('wso2is.callback');
+    Route::get('login', [AuthController::class, 'login'])->name('wso2is.login');
+    Route::get('callback', [AuthController::class, 'callback'])->name('wso2is.callback');
+    Route::post('logout', [AuthController::class, 'logout'])->name('wso2is.logout');
 });

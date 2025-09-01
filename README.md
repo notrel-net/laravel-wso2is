@@ -1,13 +1,23 @@
 # Laravel WSO2 Identity Server
 
-A Laravel package for integrating with WSO2 Identity Server, providing OAuth2 authentication, user management, and SCIM2 API access.
+A Laravel package for integrating with WSO2 Identity Server, providing OAuth2 authentication, user management, SCIM2 API access, and convenient middleware for session management.
+
+## Features
+
+- 🔐 **OAuth2/OIDC Authentication** - Complete OIDC flow with login, callback, and logout
+- 👥 **User Management** - SCIM2 API for user CRUD operations
+- 👪 **Group Management** - SCIM2 API for group operations  
+- 🏢 **Application Management** - WSO2IS REST API for application configuration
+- 🛡️ **Session Middleware** - Automatic token validation and refresh
+- 📝 **Request Classes** - Laravel-style request classes for clean authentication flows
+- ✅ **Pest Testing** - Comprehensive test suite with Pest framework
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require laravel/wso2is
+composer require donmbelembe/laravel-wso2is
 ```
 
 The package will automatically register its service provider.
@@ -15,7 +25,7 @@ The package will automatically register its service provider.
 Publish the configuration file:
 
 ```bash
-php artisan vendor:publish --provider="Laravel\Wso2is\Wso2isServiceProvider" --tag="wso2is-config"
+php artisan vendor:publish --provider="Donmbelembe\LaravelWso2is\Wso2isServiceProvider" --tag="wso2is-config"
 ```
 
 ## Configuration
@@ -26,14 +36,125 @@ Add the following environment variables to your `.env` file:
 WSO2IS_BASE_URL=https://your-wso2is-instance.com
 WSO2IS_CLIENT_ID=your-client-id
 WSO2IS_CLIENT_SECRET=your-client-secret
+WSO2IS_REDIRECT_URI=https://your-app.com/wso2is/callback
 ```
 
 ## Usage
 
-### Using the Facade
+### Authentication with Request Classes (Recommended)
+
+The package provides convenient request classes similar to Laravel WorkOS:
+
+#### Login
 
 ```php
-use Laravel\Wso2is\Facades\Wso2is;
+use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
+
+Route::get('/login', function (Wso2isLoginRequest $request) {
+    return $request->redirect([
+        'prompt' => 'login', // Optional: force login prompt
+        'loginHint' => 'user@example.com', // Optional: pre-fill username
+        'domainHint' => 'example.com', // Optional: domain hint
+    ]);
+});
+```
+
+#### Authentication Callback
+
+```php
+use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
+
+Route::get('/wso2is/callback', function (Wso2isAuthenticationRequest $request) {
+    $user = $request->authenticate(
+        // Optional: custom user finder
+        findUsing: fn($wso2isUser) => User::where('wso2is_id', $wso2isUser->id)->first(),
+        
+        // Optional: custom user creator
+        createUsing: fn($wso2isUser) => User::create([
+            'name' => $wso2isUser->getFullName(),
+            'email' => $wso2isUser->email,
+            'wso2is_id' => $wso2isUser->id,
+        ]),
+        
+        // Optional: custom user updater
+        updateUsing: fn($user, $wso2isUser) => $user->update([
+            'name' => $wso2isUser->getFullName(),
+        ])
+    );
+    
+    return $request->redirect('/dashboard');
+});
+```
+
+#### Logout
+
+```php
+use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
+
+Route::post('/logout', function (Wso2isLogoutRequest $request) {
+    return $request->logout('/'); // Optional: redirect URL after logout
+});
+```
+
+### Session Middleware
+
+Protect your routes with automatic token validation and refresh:
+
+```php
+Route::middleware('wso2is.session')->group(function () {
+    Route::get('/dashboard', function () {
+        // User is guaranteed to have valid WSO2IS session
+        return view('dashboard');
+    });
+    
+    Route::get('/profile', function () {
+        // Access tokens are automatically refreshed if needed
+        return view('profile');
+    });
+});
+```
+
+### User Model
+
+The package includes a rich User model with role and group checking:
+
+```php
+use Donmbelembe\LaravelWso2is\Wso2is;
+
+$user = Wso2is::getUserFromToken($accessToken);
+
+// User properties
+echo $user->id;
+echo $user->email;
+echo $user->getFullName();
+echo $user->username;
+
+// Role checking
+if ($user->hasRole('admin')) {
+    // User has admin role
+}
+
+if ($user->hasAnyRole(['admin', 'moderator'])) {
+    // User has at least one of these roles
+}
+
+// Group checking
+if ($user->inGroup('developers')) {
+    // User is in developers group
+}
+
+if ($user->inAnyGroup(['qa', 'testers'])) {
+    // User is in at least one of these groups
+}
+
+// Convert to array
+$userData = $user->toArray();
+```
+
+### Using the Facade (Advanced)
+
+```php
+use Donmbelembe\LaravelWso2is\Facades\Wso2is;
 
 // Get access token
 $token = Wso2is::getAccessToken();
@@ -45,7 +166,7 @@ $users = Wso2is::get('/scim2/Users');
 ### User Management
 
 ```php
-use Laravel\Wso2is\Facades\Wso2is;
+use Donmbelembe\LaravelWso2is\Facades\Wso2is;
 
 // List all users
 $users = Wso2is::users()->list();
@@ -90,7 +211,7 @@ Wso2is::users()->delete('user-id');
 ### Group Management
 
 ```php
-use Laravel\Wso2is\Facades\Wso2is;
+use Donmbelembe\LaravelWso2is\Facades\Wso2is;
 
 // List all groups
 $groups = Wso2is::groups()->list();
@@ -125,7 +246,7 @@ Wso2is::groups()->delete('group-id');
 ### Application Management
 
 ```php
-use Laravel\Wso2is\Facades\Wso2is;
+use Donmbelembe\LaravelWso2is\Facades\Wso2is;
 
 // List all applications
 $applications = Wso2is::applications()->list();
@@ -197,11 +318,11 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Security
 
-If you discover any security related issues, please email security@laravel.com instead of using the issue tracker.
+If you discover any security related issues, please email the repository maintainer instead of using the issue tracker.
 
 ## Credits
 
-- [Laravel Team](https://github.com/laravel)
+- [Don Mbelembe](https://github.com/donmbelembe)
 - [All Contributors](../../contributors)
 
 ## License

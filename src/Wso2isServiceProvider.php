@@ -1,9 +1,11 @@
 <?php
 
-namespace Laravel\Wso2is;
+namespace Donmbelembe\LaravelWso2is;
 
 use Illuminate\Support\ServiceProvider;
-use Laravel\Wso2is\Http\Client;
+use Illuminate\Routing\Router;
+use Donmbelembe\LaravelWso2is\Http\Client;
+use Donmbelembe\LaravelWso2is\Http\Middleware\ValidateSessionWithWso2is;
 
 class Wso2isServiceProvider extends ServiceProvider
 {
@@ -40,5 +42,9 @@ class Wso2isServiceProvider extends ServiceProvider
         }
 
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+
+        // Register middleware
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('wso2is.session', ValidateSessionWithWso2is::class);
     }
 }
