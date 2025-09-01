@@ -41,8 +41,6 @@ class Wso2isServiceProvider extends ServiceProvider
             ], 'wso2is-config');
         }
 
-        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
-
         // Register middleware
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('wso2is.session', ValidateSessionWithWso2is::class);

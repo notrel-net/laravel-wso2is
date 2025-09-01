@@ -43,62 +43,93 @@ WSO2IS_REDIRECT_URI=https://your-app.com/wso2is/callback
 
 ### Authentication with Request Classes (Recommended)
 
-The package provides convenient request classes similar to Laravel WorkOS:
+The package provides convenient request classes similar to Laravel WorkOS. You create the routes and controllers in your application:
 
-#### Login
+#### 1. Create Your Authentication Routes
 
 ```php
+// routes/web.php
 use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
+use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
+use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
 
-Route::get('/login', function (Wso2isLoginRequest $request) {
+Route::get('/auth/login', function (Wso2isLoginRequest $request) {
     return $request->redirect([
         'prompt' => 'login', // Optional: force login prompt
         'loginHint' => 'user@example.com', // Optional: pre-fill username
         'domainHint' => 'example.com', // Optional: domain hint
     ]);
-});
-```
+})->name('auth.login');
 
-#### Authentication Callback
-
-```php
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
-
-Route::get('/wso2is/callback', function (Wso2isAuthenticationRequest $request) {
-    $user = $request->authenticate(
-        // Optional: custom user finder
-        findUsing: fn($wso2isUser) => User::where('wso2is_id', $wso2isUser->id)->first(),
-        
-        // Optional: custom user creator
-        createUsing: fn($wso2isUser) => User::create([
-            'name' => $wso2isUser->getFullName(),
-            'email' => $wso2isUser->email,
-            'wso2is_id' => $wso2isUser->id,
-        ]),
-        
-        // Optional: custom user updater
-        updateUsing: fn($user, $wso2isUser) => $user->update([
-            'name' => $wso2isUser->getFullName(),
-        ])
-    );
-    
+Route::get('/auth/callback', function (Wso2isAuthenticationRequest $request) {
+    $user = $request->authenticate();
     return $request->redirect('/dashboard');
-});
+})->name('auth.callback');
+
+Route::post('/auth/logout', function (Wso2isLogoutRequest $request) {
+    return $request->logout('/'); // Optional: redirect URL after logout
+})->name('auth.logout');
 ```
 
-#### Logout
+#### 2. Or Create a Controller
 
 ```php
+// app/Http/Controllers/AuthController.php
+<?php
+
+namespace App\Http\Controllers;
+
+use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
+use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
 use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
 
-Route::post('/logout', function (Wso2isLogoutRequest $request) {
-    return $request->logout('/'); // Optional: redirect URL after logout
-});
+class AuthController extends Controller
+{
+    public function login(Wso2isLoginRequest $request)
+    {
+        return $request->redirect(['prompt' => 'login']);
+    }
+
+    public function callback(Wso2isAuthenticationRequest $request)
+    {
+        $user = $request->authenticate(
+            // Optional: custom user finder
+            findUsing: fn($wso2isUser) => User::where('wso2is_id', $wso2isUser->id)->first(),
+            
+            // Optional: custom user creator
+            createUsing: fn($wso2isUser) => User::create([
+                'name' => $wso2isUser->getFullName(),
+                'email' => $wso2isUser->email,
+                'wso2is_id' => $wso2isUser->id,
+            ]),
+            
+            // Optional: custom user updater
+            updateUsing: fn($user, $wso2isUser) => $user->update([
+                'name' => $wso2isUser->getFullName(),
+            ])
+        );
+        
+        return $request->redirect('/dashboard');
+    }
+
+    public function logout(Wso2isLogoutRequest $request)
+    {
+        return $request->logout('/');
+    }
+}
+```
+
+#### 3. Update Your Configuration
+
+Make sure your redirect URI points to your callback route:
+
+```env
+WSO2IS_REDIRECT_URI=https://your-app.com/auth/callback
 ```
 
 ### Session Middleware
 
-Protect your routes with automatic token validation and refresh:
+Protect your routes with automatic token validation and refresh by adding the middleware to your routes:
 
 ```php
 Route::middleware('wso2is.session')->group(function () {

@@ -25,17 +25,24 @@
 - OIDC discovery document caching
 - JWKs caching for performance
 
-### 5. **Enhanced Controllers**
-- `AuthController` - Clean authentication flow using request classes
-- Updated routes with new endpoints
+### 5. **Package Architecture** (Like Laravel WorkOS)
+- **No predefined routes or controllers** - Developers create their own
+- **Request classes** for clean authentication flows
+- **Middleware** for session protection
+- **Flexibility** to implement authentication however you want
 
 ## 📖 Quick Usage Examples
 
-### Protected Routes with Middleware
+### Create Your Own Routes
 ```php
-Route::middleware('wso2is.session')->group(function () {
-    Route::get('/dashboard', DashboardController::class);
-    Route::get('/profile', ProfileController::class);
+// In your routes/web.php
+Route::get('/auth/login', function (Wso2isLoginRequest $request) {
+    return $request->redirect(['prompt' => 'login']);
+});
+
+Route::get('/auth/callback', function (Wso2isAuthenticationRequest $request) {
+    $user = $request->authenticate();
+    return $request->redirect('/dashboard');
 });
 ```
 
