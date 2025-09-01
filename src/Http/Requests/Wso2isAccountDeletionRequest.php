@@ -26,7 +26,7 @@ class Wso2isAccountDeletionRequest extends FormRequest
         if ($user && $accessToken) {
             // Delete user from WSO2IS if we have access token
             $this->deleteUserFromWso2is($user, $accessToken);
-            
+
             // Delete user from local database
             $deleteUsing($user);
         }
@@ -57,12 +57,12 @@ class Wso2isAccountDeletionRequest extends FormRequest
         try {
             // Get WSO2IS user ID from the user model
             $wso2isUserId = $user->wso2is_id ?? null;
-            
+
             if (!$wso2isUserId) {
                 // Try to find user by email if no wso2is_id stored
                 $client = app('wso2is');
                 $users = $client->users()->list(['filter' => "emails eq \"{$user->email}\""]);
-                
+
                 if (!empty($users['Resources'])) {
                     $wso2isUserId = $users['Resources'][0]['id'];
                 }
