@@ -499,7 +499,8 @@ vendor/bin/phpunit --configuration phpunit.integration.xml --filter Authenticati
 Integration tests cover:
 - OAuth token acquisition and API access
 - OIDC-compliant authentication verification
-- Error handling and edge cases
+
+**Note**: User and Group management integration tests are currently disabled as they require additional OAuth scopes to be configured in your WSO2IS instance. Only authentication tests are enabled by default.
 
 Tests automatically clean up created resources after each test.
 
