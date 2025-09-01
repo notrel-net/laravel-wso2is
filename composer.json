@@ -40,10 +40,16 @@
             "Tests\\": "tests/"
         }
     },
-    "extra": {
-    },
+    "extra": {},
     "scripts": {
-        "test": "pest"
+        "test": "pest",
+        "test:unit": "pest --testsuite=Unit",
+        "test:feature": "pest --testsuite=Feature",
+        "test:integration": "phpunit --configuration phpunit.integration.xml",
+        "test:all": [
+            "@test",
+            "@test:integration"
+        ]
     },
     "config": {
         "sort-packages": true,

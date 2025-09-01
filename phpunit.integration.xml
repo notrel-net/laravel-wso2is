@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+    bootstrap="vendor/autoload.php"
+    colors="true"
+>
+    <testsuites>
+        <testsuite name="Integration">
+            <directory suffix="Test.php">./tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory suffix=".php">./src</directory>
+        </include>
+    </source>
+    <php>
+        <env name="WSO2IS_BASE_URL" value="https://localhost:9443" />
+        <env name="WSO2IS_CLIENT_ID" value="your-client-id" />
+        <env name="WSO2IS_CLIENT_SECRET" value="your-client-secret" />
+        <env name="WSO2IS_USERNAME" value="admin" />
+        <env name="WSO2IS_PASSWORD" value="admin" />
+        <env name="WSO2IS_TENANT_DOMAIN" value="carbon.super" />
+    </php>
+</phpunit>

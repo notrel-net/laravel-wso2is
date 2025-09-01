@@ -29,6 +29,12 @@ Thumbs.db
 /build/
 /coverage/
 /.phpunit.cache/
+.pest/
+.phpunit.cache/
+
+# Test artifacts
+test-results/
+*.junit.xml
 
 # Logs
 *.log
@@ -53,6 +59,12 @@ temp/
 .env
 .env.local
 .env.*.local
+.env.integration
+.env.testing
+
+# Integration test output
+/build/integration/
+integration-test-results.xml
 
 # Cache files
 .cache/
@@ -60,7 +72,22 @@ temp/
 
 # Static analysis
 .phpstan.cache
+.psalm.cache
 
 # Package specific
 .pest/
 .phpunit.cache/
+
+# Composer
+composer.lock
+auth.json
+
+# Laravel specific (if used in development)
+bootstrap/cache/
+storage/
+public/storage
+public/hot
+
+# Docker (if used for testing)
+docker-compose.override.yml
+.dockerignore

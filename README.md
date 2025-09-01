@@ -437,6 +437,61 @@ Or directly:
 vendor/bin/pest
 ```
 
+### Integration Testing with Real WSO2IS
+
+To test against a real WSO2 Identity Server instance:
+
+#### 1. Setup WSO2IS Application
+
+1. Start WSO2 Identity Server
+2. Access Management Console: `https://localhost:9443/carbon`
+3. Login with admin credentials
+4. Create a new OAuth application:
+   - Go to **Main > Identity > Service Providers**
+   - Click **Add** and create a new service provider
+   - Configure **Inbound Authentication Configuration > OAuth/OpenID Connect**
+   - Add required scopes: `internal_user_mgt_*`, `internal_group_mgt_*`, `internal_application_mgt_*`
+   - Note down the **Client ID** and **Client Secret**
+
+#### 2. Configure Test Environment
+
+```bash
+# Copy environment file
+cp .env.integration.example .env.integration
+```
+
+Edit `.env.integration` with your WSO2IS details:
+
+```env
+WSO2IS_BASE_URL=https://localhost:9443
+WSO2IS_CLIENT_ID=your-actual-client-id
+WSO2IS_CLIENT_SECRET=your-actual-client-secret
+WSO2IS_USERNAME=admin
+WSO2IS_PASSWORD=admin
+```
+
+#### 3. Run Integration Tests
+
+```bash
+# Run all tests (unit + integration)
+composer test:all
+
+# Run only integration tests
+composer test:integration
+
+# Run specific integration test
+vendor/bin/phpunit --configuration phpunit.integration.xml --filter UserManagementIntegrationTest
+```
+
+Integration tests cover:
+- OAuth token acquisition and API access
+- User CRUD operations via SCIM2 API
+- Group management and membership
+- Search/filter operations
+- Error handling and edge cases
+
+Tests automatically clean up created resources after each test.
+
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
