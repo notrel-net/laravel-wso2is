@@ -14,7 +14,9 @@
     "authors": [
         {
             "name": "Don Mbelembe",
-            "email": "donmbelembe@example.com"
+            "email": "bizroy678@gmail.com",
+            "homepage": "https://github.com/donmbelembe",
+            "role": "Developer"
         }
     ],
     "require": {
@@ -57,6 +59,10 @@
             "pestphp/pest-plugin": true
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "support": {
+        "issues": "https://github.com/notrel-net/laravel-wso2is/issues",
+        "source": "https://github.com/notrel-net/laravel-wso2is"
+    }
 }
