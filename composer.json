@@ -41,14 +41,6 @@
         }
     },
     "extra": {
-        "laravel": {
-            "providers": [
-                "Notrel\\LaravelWso2is\\Wso2isServiceProvider"
-            ],
-            "aliases": {
-                "Wso2is": "Notrel\\LaravelWso2is\\Facades\\Wso2is"
-            }
-        }
     },
     "scripts": {
         "test": "pest"

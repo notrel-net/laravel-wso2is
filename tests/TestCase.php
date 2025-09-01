@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Notrel\LaravelWso2is\Wso2isServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -14,9 +13,7 @@ abstract class TestCase extends Orchestra
 
     protected function getPackageProviders($app)
     {
-        return [
-            Wso2isServiceProvider::class,
-        ];
+        return [];
     }
 
     protected function getEnvironmentSetUp($app)

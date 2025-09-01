@@ -208,37 +208,51 @@ if ($user->inAnyGroup(['qa', 'testers'])) {
 $userData = $user->toArray();
 ```
 
-### Using the Facade (Advanced)
+### Using the HTTP Client (Advanced)
 
 ```php
-use Notrel\LaravelWso2is\Facades\Wso2is;
+use Notrel\LaravelWso2is\Http\Client;
+
+// Create a client instance
+$client = new Client(
+    baseUrl: config('services.wso2is.base_url'),
+    clientId: config('services.wso2is.client_id'),
+    clientSecret: config('services.wso2is.client_secret')
+);
 
 // Get access token
-$token = Wso2is::getAccessToken();
+$token = $client->getAccessToken();
 
 // Make raw API requests
-$users = Wso2is::get('/scim2/Users');
+$users = $client->get('/scim2/Users');
 ```
 
 ### User Management
 
 ```php
-use Notrel\LaravelWso2is\Facades\Wso2is;
+use Notrel\LaravelWso2is\Http\Client;
+
+// Create a client instance
+$client = new Client(
+    baseUrl: config('services.wso2is.base_url'),
+    clientId: config('services.wso2is.client_id'),
+    clientSecret: config('services.wso2is.client_secret')
+);
 
 // List all users
-$users = Wso2is::users()->list();
+$users = $client->users()->list();
 
 // Get a specific user
-$user = Wso2is::users()->get('user-id');
+$user = $client->users()->get('user-id');
 
 // Get user by username
-$user = Wso2is::users()->getByUsername('john.doe');
+$user = $client->users()->getByUsername('john.doe');
 
 // Get user by email
-$user = Wso2is::users()->getByEmail('john@example.com');
+$user = $client->users()->getByEmail('john@example.com');
 
 // Create a new user
-$newUser = Wso2is::users()->create([
+$newUser = $client->users()->create([
     'userName' => 'john.doe',
     'name' => [
         'givenName' => 'John',
@@ -254,7 +268,7 @@ $newUser = Wso2is::users()->create([
 ]);
 
 // Update a user
-$updatedUser = Wso2is::users()->update('user-id', [
+$updatedUser = $client->users()->update('user-id', [
     'name' => [
         'givenName' => 'John',
         'familyName' => 'Smith'
@@ -262,25 +276,32 @@ $updatedUser = Wso2is::users()->update('user-id', [
 ]);
 
 // Delete a user
-Wso2is::users()->delete('user-id');
+$client->users()->delete('user-id');
 ```
 
 ### Group Management
 
 ```php
-use Notrel\LaravelWso2is\Facades\Wso2is;
+use Notrel\LaravelWso2is\Http\Client;
+
+// Create a client instance
+$client = new Client(
+    baseUrl: config('services.wso2is.base_url'),
+    clientId: config('services.wso2is.client_id'),
+    clientSecret: config('services.wso2is.client_secret')
+);
 
 // List all groups
-$groups = Wso2is::groups()->list();
+$groups = $client->groups()->list();
 
 // Get a specific group
-$group = Wso2is::groups()->get('group-id');
+$group = $client->groups()->get('group-id');
 
 // Get group by name
-$group = Wso2is::groups()->getByName('Administrators');
+$group = $client->groups()->getByName('Administrators');
 
 // Create a new group
-$newGroup = Wso2is::groups()->create([
+$newGroup = $client->groups()->create([
     'displayName' => 'New Group',
     'members' => [
         [
@@ -291,54 +312,101 @@ $newGroup = Wso2is::groups()->create([
 ]);
 
 // Add user to group
-Wso2is::groups()->addUser('group-id', 'user-id');
+$client->groups()->addUser('group-id', 'user-id');
 
 // Remove user from group
-Wso2is::groups()->removeUser('group-id', 'user-id');
+$client->groups()->removeUser('group-id', 'user-id');
 
 // Delete a group
-Wso2is::groups()->delete('group-id');
+$client->groups()->delete('group-id');
 ```
 
 ### Application Management
 
 ```php
-use Notrel\LaravelWso2is\Facades\Wso2is;
+use Notrel\LaravelWso2is\Http\Client;
+
+// Create a client instance
+$client = new Client(
+    baseUrl: config('services.wso2is.base_url'),
+    clientId: config('services.wso2is.client_id'),
+    clientSecret: config('services.wso2is.client_secret')
+);
 
 // List all applications
-$applications = Wso2is::applications()->list();
+$applications = $client->applications()->list();
 
 // Get a specific application
-$app = Wso2is::applications()->get('app-id');
+$app = $client->applications()->get('app-id');
 
 // Get application by name
-$app = Wso2is::applications()->getByName('My App');
+$app = $client->applications()->getByName('My App');
 
 // Create a new application
-$newApp = Wso2is::applications()->create([
+$newApp = $client->applications()->create([
     'name' => 'My Laravel App',
     'description' => 'A Laravel application'
 ]);
 
 // Get OAuth2 configuration
-$oauthConfig = Wso2is::applications()->getOAuth2Config('app-id');
+$oauthConfig = $client->applications()->getOAuth2Config('app-id');
 
 // Update OAuth2 configuration
-$updatedConfig = Wso2is::applications()->updateOAuth2Config('app-id', [
+$updatedConfig = $client->applications()->updateOAuth2Config('app-id', [
     'grantTypes' => ['authorization_code', 'refresh_token'],
     'callbackURLs' => ['https://myapp.com/auth/callback']
 ]);
 
 // Regenerate client secret
-$newSecret = Wso2is::applications()->regenerateClientSecret('app-id');
+$newSecret = $client->applications()->regenerateClientSecret('app-id');
 ```
 
 ### OAuth2 Authentication Flow
 
-The package provides a callback route for handling OAuth2 authentication:
+The package provides request classes to handle OAuth2 authentication flows. You'll need to set up your own routes and controllers:
 
 ```php
-// The callback route is automatically registered at: /wso2is/callback
+// In your controller
+use Notrel\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
+
+// Initiate login
+public function login()
+{
+    $loginRequest = new Wso2isLoginRequest();
+    return redirect($loginRequest->getRedirectUrl());
+}
+
+// Handle callback
+public function callback(Request $request)
+{
+    $authRequest = new Wso2isAuthenticationRequest($request);
+    
+    try {
+        $user = $authRequest->getUser();
+        // Handle successful authentication
+        // Store user data, create session, etc.
+        
+        return redirect('/dashboard');
+    } catch (\Exception $e) {
+        // Handle authentication error
+        return redirect('/login')->withErrors(['error' => 'Authentication failed']);
+    }
+}
+
+// Handle logout
+public function logout()
+{
+    $logoutRequest = new Wso2isLogoutRequest();
+    
+    // Clear local session
+    auth()->logout();
+    session()->flush();
+    
+    // Redirect to WSO2IS logout
+    return redirect($logoutRequest->getRedirectUrl());
+}
 ```
 
 To initiate the OAuth2 flow, redirect users to your WSO2IS authorization endpoint:
