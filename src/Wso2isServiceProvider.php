@@ -1,11 +1,11 @@
 <?php
 
-namespace Donmbelembe\LaravelWso2is;
+namespace Notrel\LaravelWso2is;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Router;
-use Donmbelembe\LaravelWso2is\Http\Client;
-use Donmbelembe\LaravelWso2is\Http\Middleware\ValidateSessionWithWso2is;
+use Notrel\LaravelWso2is\Http\Client;
+use Notrel\LaravelWso2is\Http\Middleware\ValidateSessionWithWso2is;
 
 class Wso2isServiceProvider extends ServiceProvider
 {

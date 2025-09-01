@@ -1,6 +1,6 @@
 <?php
 
-use Donmbelembe\LaravelWso2is\User;
+use Notrel\LaravelWso2is\User;
 
 it('creates user with all properties', function () {
     $user = new User(

@@ -1,6 +1,6 @@
 <?php
 
-namespace Donmbelembe\LaravelWso2is;
+namespace Notrel\LaravelWso2is;
 
 class User
 {

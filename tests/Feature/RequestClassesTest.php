@@ -1,8 +1,8 @@
 <?php
 
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;

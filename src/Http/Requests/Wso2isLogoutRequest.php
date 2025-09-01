@@ -1,11 +1,11 @@
 <?php
 
-namespace Donmbelembe\LaravelWso2is\Http\Requests;
+namespace Notrel\LaravelWso2is\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Donmbelembe\LaravelWso2is\Wso2is;
+use Notrel\LaravelWso2is\Wso2is;
 use Symfony\Component\HttpFoundation\Response;
 
 class Wso2isLogoutRequest extends FormRequest

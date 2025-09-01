@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Donmbelembe\LaravelWso2is\Wso2isServiceProvider;
+use Notrel\LaravelWso2is\Wso2isServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra

@@ -1,5 +1,5 @@
 {
-    "name": "donmbelembe/laravel-wso2is",
+    "name": "notrel/laravel-wso2is",
     "description": "A Laravel package for integrating with WSO2 Identity Server",
     "type": "library",
     "license": "MIT",
@@ -32,7 +32,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Donmbelembe\\LaravelWso2is\\": "src/"
+            "Notrel\\LaravelWso2is\\": "src/"
         }
     },
     "autoload-dev": {
@@ -43,10 +43,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Donmbelembe\\LaravelWso2is\\Wso2isServiceProvider"
+                "Notrel\\LaravelWso2is\\Wso2isServiceProvider"
             ],
             "aliases": {
-                "Wso2is": "Donmbelembe\\LaravelWso2is\\Facades\\Wso2is"
+                "Wso2is": "Notrel\\LaravelWso2is\\Facades\\Wso2is"
             }
         }
     },

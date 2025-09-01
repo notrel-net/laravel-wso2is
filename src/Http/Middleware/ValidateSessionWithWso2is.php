@@ -1,11 +1,12 @@
 <?php
 
-namespace Donmbelembe\LaravelWso2is\Http\Middleware;
+namespace Notrel\LaravelWso2is\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
-use Donmbelembe\LaravelWso2is\Wso2is;
+use Notrel\LaravelWso2is\Wso2is;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ValidateSessionWithWso2is

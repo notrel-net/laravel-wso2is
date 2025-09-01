@@ -1,6 +1,6 @@
 <?php
 
-namespace Donmbelembe\LaravelWso2is;
+namespace Notrel\LaravelWso2is;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;

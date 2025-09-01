@@ -1,14 +1,14 @@
 <?php
 
-namespace Donmbelembe\LaravelWso2is\Http;
+namespace Notrel\LaravelWso2is\Http;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
-use Donmbelembe\LaravelWso2is\Resources\User;
-use Donmbelembe\LaravelWso2is\Resources\Group;
-use Donmbelembe\LaravelWso2is\Resources\Application;
+use Notrel\LaravelWso2is\Resources\User;
+use Notrel\LaravelWso2is\Resources\Group;
+use Notrel\LaravelWso2is\Resources\Application;
 
 class Client
 {

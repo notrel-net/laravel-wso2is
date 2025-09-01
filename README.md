@@ -17,7 +17,7 @@ A Laravel package for integrating with WSO2 Identity Server, providing OAuth2 au
 You can install the package via composer:
 
 ```bash
-composer require donmbelembe/laravel-wso2is
+composer require notrel/laravel-wso2is
 ```
 
 The package will automatically register its service provider.
@@ -60,9 +60,9 @@ The package provides convenient request classes similar to Laravel WorkOS. You c
 
 ```php
 // routes/web.php
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
 
 Route::get('/auth/login', function (Wso2isLoginRequest $request) {
     return $request->redirect([
@@ -90,9 +90,9 @@ Route::post('/auth/logout', function (Wso2isLogoutRequest $request) {
 
 namespace App\Http\Controllers;
 
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
-use Donmbelembe\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
 
 class AuthController extends Controller
 {
@@ -161,7 +161,7 @@ Route::middleware('wso2is.session')->group(function () {
 The package includes a rich User model with role and group checking:
 
 ```php
-use Donmbelembe\LaravelWso2is\Wso2is;
+use Notrel\LaravelWso2is\Wso2is;
 
 $user = Wso2is::getUserFromToken($accessToken);
 
@@ -196,7 +196,7 @@ $userData = $user->toArray();
 ### Using the Facade (Advanced)
 
 ```php
-use Donmbelembe\LaravelWso2is\Facades\Wso2is;
+use Notrel\LaravelWso2is\Facades\Wso2is;
 
 // Get access token
 $token = Wso2is::getAccessToken();
@@ -208,7 +208,7 @@ $users = Wso2is::get('/scim2/Users');
 ### User Management
 
 ```php
-use Donmbelembe\LaravelWso2is\Facades\Wso2is;
+use Notrel\LaravelWso2is\Facades\Wso2is;
 
 // List all users
 $users = Wso2is::users()->list();
@@ -253,7 +253,7 @@ Wso2is::users()->delete('user-id');
 ### Group Management
 
 ```php
-use Donmbelembe\LaravelWso2is\Facades\Wso2is;
+use Notrel\LaravelWso2is\Facades\Wso2is;
 
 // List all groups
 $groups = Wso2is::groups()->list();
@@ -288,7 +288,7 @@ Wso2is::groups()->delete('group-id');
 ### Application Management
 
 ```php
-use Donmbelembe\LaravelWso2is\Facades\Wso2is;
+use Notrel\LaravelWso2is\Facades\Wso2is;
 
 // List all applications
 $applications = Wso2is::applications()->list();

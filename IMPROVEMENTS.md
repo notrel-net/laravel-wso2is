@@ -82,7 +82,7 @@ Route::post('/logout', function (Wso2isLogoutRequest $request) {
 
 ### Working with Users
 ```php
-use Donmbelembe\LaravelWso2is\Wso2is;
+use Notrel\LaravelWso2is\Wso2is;
 
 $user = Wso2is::getUserFromToken($accessToken);
 
@@ -102,7 +102,7 @@ if ($user->inAnyGroup(['qa', 'developers'])) {
 - Integration tests for middleware (some skipped due to complexity)
 
 ## 🔄 Migration from Previous Version
-1. Update namespaces from `Laravel\Wso2is` to `Donmbelembe\LaravelWso2is`
+1. Update namespaces from `Laravel\Wso2is` to `Notrel\LaravelWso2is`
 2. Add new middleware to routes that need session validation
 3. Optionally replace manual auth flows with request classes
 4. Update configuration to include `WSO2IS_REDIRECT_URI`

@@ -1,9 +1,9 @@
 <?php
 
-use Donmbelembe\LaravelWso2is\Http\Client;
-use Donmbelembe\LaravelWso2is\Resources\User;
-use Donmbelembe\LaravelWso2is\Resources\Group;
-use Donmbelembe\LaravelWso2is\Resources\Application;
+use Notrel\LaravelWso2is\Http\Client;
+use Notrel\LaravelWso2is\Resources\User;
+use Notrel\LaravelWso2is\Resources\Group;
+use Notrel\LaravelWso2is\Resources\Application;
 use Illuminate\Support\Facades\Http;
 
 it('can create client instance', function () {

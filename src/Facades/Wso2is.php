@@ -1,9 +1,9 @@
 <?php
 
-namespace Donmbelembe\LaravelWso2is\Facades;
+namespace Notrel\LaravelWso2is\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Donmbelembe\LaravelWso2is\Http\Client;
+use Notrel\LaravelWso2is\Http\Client;
 
 /**
  * @method static string getAccessToken()
@@ -13,7 +13,7 @@ use Donmbelembe\LaravelWso2is\Http\Client;
  * @method static array put(string $endpoint, array $data = [])
  * @method static array delete(string $endpoint, array $data = [])
  *
- * @see \Donmbelembe\LaravelWso2is\Http\Client
+ * @see \Notrel\LaravelWso2is\Http\Client
  */
 class Wso2is extends Facade
 {

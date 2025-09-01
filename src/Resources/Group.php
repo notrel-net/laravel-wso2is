@@ -1,8 +1,8 @@
 <?php
 
-namespace Donmbelembe\LaravelWso2is\Resources;
+namespace Notrel\LaravelWso2is\Resources;
 
-use Donmbelembe\LaravelWso2is\Http\Client;
+use Notrel\LaravelWso2is\Http\Client;
 
 class Group
 {

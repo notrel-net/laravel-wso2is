@@ -1,6 +1,6 @@
 <?php
 
-use Donmbelembe\LaravelWso2is\Http\Middleware\ValidateSessionWithWso2is;
+use Notrel\LaravelWso2is\Http\Middleware\ValidateSessionWithWso2is;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;

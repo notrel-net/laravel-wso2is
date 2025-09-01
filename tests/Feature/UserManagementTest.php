@@ -1,7 +1,7 @@
 <?php
 
-use Donmbelembe\LaravelWso2is\Http\Client;
-use Donmbelembe\LaravelWso2is\Resources\User;
+use Notrel\LaravelWso2is\Http\Client;
+use Notrel\LaravelWso2is\Resources\User;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
