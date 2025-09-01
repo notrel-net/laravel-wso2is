@@ -1,0 +1,64 @@
+{
+    "name": "laravel/wso2is",
+    "description": "A Laravel package for integrating with WSO2 Identity Server",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "wso2",
+        "identity-server",
+        "oauth",
+        "authentication",
+        "authorization"
+    ],
+    "authors": [
+        {
+            "name": "Laravel Team",
+            "email": "support@laravel.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0|^12.0",
+        "illuminate/http": "^11.0|^12.0",
+        "illuminate/support": "^11.0|^12.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.6",
+        "orchestra/testbench": "^9.0|^10.0",
+        "pestphp/pest": "^3.0",
+        "phpstan/phpstan": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laravel\\Wso2is\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Laravel\\Wso2is\\Wso2isServiceProvider"
+            ],
+            "aliases": {
+                "Wso2is": "Laravel\\Wso2is\\Facades\\Wso2is"
+            }
+        }
+    },
+    "scripts": {
+        "test": "pest"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
