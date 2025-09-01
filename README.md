@@ -22,21 +22,32 @@ composer require donmbelembe/laravel-wso2is
 
 The package will automatically register its service provider.
 
-Publish the configuration file:
+### Configuration
 
-```bash
-php artisan vendor:publish --provider="Donmbelembe\LaravelWso2is\Wso2isServiceProvider" --tag="wso2is-config"
+Add your WSO2IS configuration to your `config/services.php` file:
+
+```php
+'wso2is' => [
+    'base_url' => env('WSO2IS_BASE_URL', 'https://localhost:9443'),
+    'client_id' => env('WSO2IS_CLIENT_ID'),
+    'client_secret' => env('WSO2IS_CLIENT_SECRET'),
+    'redirect_uri' => env('WSO2IS_REDIRECT_URI'),
+    'scopes' => env('WSO2IS_SCOPES', 'openid,profile,email'),
+    'scim_username' => env('WSO2IS_SCIM_USERNAME'),
+    'scim_password' => env('WSO2IS_SCIM_PASSWORD'),
+],
 ```
 
-## Configuration
-
-Add the following environment variables to your `.env` file:
+Then update your `.env` file:
 
 ```env
 WSO2IS_BASE_URL=https://your-wso2is-instance.com
 WSO2IS_CLIENT_ID=your-client-id
 WSO2IS_CLIENT_SECRET=your-client-secret
-WSO2IS_REDIRECT_URI=https://your-app.com/wso2is/callback
+WSO2IS_REDIRECT_URI=https://your-app.com/auth/callback
+WSO2IS_SCOPES="openid,profile,email"
+WSO2IS_SCIM_USERNAME=your-scim-username
+WSO2IS_SCIM_PASSWORD=your-scim-password
 ```
 
 ## Usage
@@ -320,7 +331,7 @@ To initiate the OAuth2 flow, redirect users to your WSO2IS authorization endpoin
 ```php
 $authUrl = 'https://your-wso2is-instance.com/oauth2/authorize?' . http_build_query([
     'response_type' => 'code',
-    'client_id' => config('wso2is.client_id'),
+    'client_id' => config('services.wso2is.client_id'),
     'redirect_uri' => route('wso2is.callback'),
     'scope' => 'openid profile email',
     'state' => csrf_token()

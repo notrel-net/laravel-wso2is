@@ -49,8 +49,7 @@ class Wso2isLogoutRequest extends FormRequest
 
         $discovery = Wso2is::getDiscoveryDocument();
         $logoutEndpoint = $discovery['end_session_endpoint'] ??
-            config('wso2is.base_url') . '/oidc/logout';
-
+            config('services.wso2is.base_url') . '/oidc/logout';
         return $logoutEndpoint . (empty($params) ? '' : '?' . http_build_query($params));
     }
 }

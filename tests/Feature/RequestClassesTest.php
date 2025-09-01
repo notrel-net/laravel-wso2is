@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 beforeEach(function () {
-    Config::set('wso2is.base_url', 'https://localhost:9443');
-    Config::set('wso2is.client_id', 'test_client_id');
-    Config::set('wso2is.client_secret', 'test_client_secret');
-    Config::set('wso2is.redirect_uri', 'https://laravel.app/wso2is/callback');
-    Config::set('wso2is.scopes', ['openid', 'profile', 'email']);
+    Config::set('services.wso2is.base_url', 'https://localhost:9443');
+    Config::set('services.wso2is.client_id', 'test_client_id');
+    Config::set('services.wso2is.client_secret', 'test_client_secret');
+    Config::set('services.wso2is.redirect_uri', 'https://laravel.app/wso2is/callback');
+    Config::set('services.wso2is.scopes', ['openid', 'profile', 'email']);
 });
 
 it('creates login request and redirects to WSO2IS', function () {

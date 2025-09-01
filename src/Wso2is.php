@@ -14,20 +14,20 @@ class Wso2is
      */
     public static function configure(): void
     {
-        if (! config('wso2is.base_url')) {
-            throw new RuntimeException("The 'wso2is.base_url' configuration value is undefined.");
+        if (! config('services.wso2is.base_url')) {
+            throw new RuntimeException("The 'services.wso2is.base_url' configuration value is undefined.");
         }
 
-        if (! config('wso2is.client_id')) {
-            throw new RuntimeException("The 'wso2is.client_id' configuration value is undefined.");
+        if (! config('services.wso2is.client_id')) {
+            throw new RuntimeException("The 'services.wso2is.client_id' configuration value is undefined.");
         }
 
-        if (! config('wso2is.client_secret')) {
-            throw new RuntimeException("The 'wso2is.client_secret' configuration value is undefined.");
+        if (! config('services.wso2is.client_secret')) {
+            throw new RuntimeException("The 'services.wso2is.client_secret' configuration value is undefined.");
         }
 
-        if (! config('wso2is.redirect_uri')) {
-            throw new RuntimeException("The 'wso2is.redirect_uri' configuration value is undefined.");
+        if (! config('services.wso2is.redirect_uri')) {
+            throw new RuntimeException("The 'services.wso2is.redirect_uri' configuration value is undefined.");
         }
     }
 
@@ -54,7 +54,7 @@ class Wso2is
     {
         try {
             $response = Http::withToken($accessToken)
-                ->get(config('wso2is.base_url') . '/oauth2/userinfo');
+                ->get(config('services.wso2is.base_url') . '/oauth2/userinfo');
 
             return $response->successful();
         } catch (Throwable $e) {
@@ -67,11 +67,11 @@ class Wso2is
      */
     protected static function refreshAccessToken(string $refreshToken): array
     {
-        $response = Http::asForm()->post(config('wso2is.base_url') . '/oauth2/token', [
+        $response = Http::asForm()->post(config('services.wso2is.base_url') . '/oauth2/token', [
             'grant_type' => 'refresh_token',
             'refresh_token' => $refreshToken,
-            'client_id' => config('wso2is.client_id'),
-            'client_secret' => config('wso2is.client_secret'),
+            'client_id' => config('services.wso2is.client_id'),
+            'client_secret' => config('services.wso2is.client_secret'),
         ]);
 
         if (! $response->successful()) {
@@ -93,7 +93,7 @@ class Wso2is
     {
         try {
             $response = Http::withToken($accessToken)
-                ->get(config('wso2is.base_url') . '/oauth2/userinfo');
+                ->get(config('services.wso2is.base_url') . '/oauth2/userinfo');
 
             if (! $response->successful()) {
                 return null;
@@ -121,7 +121,7 @@ class Wso2is
     public static function getDiscoveryDocument(): array
     {
         return Cache::remember('wso2is:discovery', now()->addHours(12), function () {
-            $response = Http::get(config('wso2is.base_url') . '/oauth2/oidcdiscovery');
+            $response = Http::get(config('services.wso2is.base_url') . '/oauth2/oidcdiscovery');
 
             if (! $response->successful()) {
                 throw new RuntimeException('Failed to retrieve OIDC discovery document.');

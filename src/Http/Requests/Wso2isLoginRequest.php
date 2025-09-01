@@ -34,9 +34,9 @@ class Wso2isLoginRequest extends FormRequest
 
         $params = [
             'response_type' => 'code',
-            'client_id' => config('wso2is.client_id'),
-            'redirect_uri' => config('wso2is.redirect_uri'),
-            'scope' => implode(' ', config('wso2is.scopes', ['openid', 'profile', 'email'])),
+            'client_id' => config('services.wso2is.client_id'),
+            'redirect_uri' => config('services.wso2is.redirect_uri'),
+            'scope' => implode(' ', config('services.wso2is.scopes', ['openid', 'profile', 'email'])),
             'state' => json_encode($state),
             'nonce' => $state['nonce'],
         ];
@@ -62,7 +62,7 @@ class Wso2isLoginRequest extends FormRequest
             $params['acr_values'] = $options['acrValues'];
         }
 
-        $url = config('wso2is.base_url') . '/oauth2/authorize?' . http_build_query($params);
+        $url = config('services.wso2is.base_url') . '/oauth2/authorize?' . http_build_query($params);
 
         $this->session()->put('wso2is_state', json_encode($state));
 

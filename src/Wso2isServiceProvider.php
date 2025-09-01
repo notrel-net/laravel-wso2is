@@ -14,16 +14,11 @@ class Wso2isServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(
-            __DIR__ . '/../config/wso2is.php',
-            'wso2is'
-        );
-
         $this->app->singleton(Client::class, function ($app) {
             return new Client(
-                baseUrl: $app['config']['wso2is.base_url'],
-                clientId: $app['config']['wso2is.client_id'],
-                clientSecret: $app['config']['wso2is.client_secret']
+                baseUrl: $app['config']['services.wso2is.base_url'],
+                clientId: $app['config']['services.wso2is.client_id'],
+                clientSecret: $app['config']['services.wso2is.client_secret']
             );
         });
 
@@ -35,12 +30,6 @@ class Wso2isServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../config/wso2is.php' => config_path('wso2is.php'),
-            ], 'wso2is-config');
-        }
-
         // Register middleware
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('wso2is.session', ValidateSessionWithWso2is::class);

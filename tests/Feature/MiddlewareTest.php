@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
-    Config::set('wso2is.base_url', 'https://localhost:9443');
-    Config::set('wso2is.client_id', 'test_client_id');
-    Config::set('wso2is.client_secret', 'test_client_secret');
-    Config::set('wso2is.redirect_uri', 'https://laravel.app/wso2is/callback');
+    Config::set('services.wso2is.base_url', 'https://localhost:9443');
+    Config::set('services.wso2is.client_id', 'test_client_id');
+    Config::set('services.wso2is.client_secret', 'test_client_secret');
+    Config::set('services.wso2is.redirect_uri', 'https://laravel.app/wso2is/callback');
 });
 
 it('allows request to pass with valid session tokens', function () {

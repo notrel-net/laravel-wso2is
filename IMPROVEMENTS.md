@@ -2,30 +2,45 @@
 
 ## 🚀 New Features Added
 
-### 1. **Session Middleware** (`ValidateSessionWithWso2is`)
+### 1. **Configuration** (Laravel Services Pattern)
+Add your WSO2IS configuration to `config/services.php`:
+
+```php
+'wso2is' => [
+    'base_url' => env('WSO2IS_BASE_URL', 'https://localhost:9443'),
+    'client_id' => env('WSO2IS_CLIENT_ID'),
+    'client_secret' => env('WSO2IS_CLIENT_SECRET'),
+    'redirect_uri' => env('WSO2IS_REDIRECT_URI'),
+    'scopes' => env('WSO2IS_SCOPES', 'openid,profile,email'),
+    'scim_username' => env('WSO2IS_SCIM_USERNAME'),
+    'scim_password' => env('WSO2IS_SCIM_PASSWORD'),
+],
+```
+
+### 2. **Session Middleware** (`ValidateSessionWithWso2is`)
 - Automatically validates access tokens on protected routes
 - Refreshes expired tokens using refresh tokens
 - Logs out users when tokens are invalid
 - Register in your routes: `Route::middleware('wso2is.session')`
 
-### 2. **Request Classes** (Laravel WorkOS Style)
+### 3. **Request Classes** (Laravel WorkOS Style)
 - `Wso2isLoginRequest` - Handle login redirects with OIDC parameters
 - `Wso2isAuthenticationRequest` - Process OAuth2 callbacks
 - `Wso2isLogoutRequest` - Handle logout with SSO support
 
-### 3. **Enhanced User Model**
+### 4. **Enhanced User Model**
 - Role checking: `$user->hasRole('admin')`, `$user->hasAnyRole(['admin', 'editor'])`
 - Group checking: `$user->inGroup('developers')`, `$user->inAnyGroup(['qa', 'testers'])`
 - Full name generation: `$user->getFullName()`
 - Array conversion: `$user->toArray()`
 
-### 4. **Main WSO2IS Class**
+### 5. **Main WSO2IS Class**
 - Token validation and refresh logic
 - User info retrieval from access tokens
 - OIDC discovery document caching
 - JWKs caching for performance
 
-### 5. **Package Architecture** (Like Laravel WorkOS)
+### 6. **Package Architecture** (Like Laravel WorkOS)
 - **No predefined routes or controllers** - Developers create their own
 - **Request classes** for clean authentication flows
 - **Middleware** for session protection

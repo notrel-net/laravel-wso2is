@@ -21,8 +21,9 @@ abstract class TestCase extends Orchestra
 
     protected function getEnvironmentSetUp($app)
     {
-        config()->set('wso2is.base_url', 'https://test.wso2is.com');
-        config()->set('wso2is.client_id', 'test-client-id');
-        config()->set('wso2is.client_secret', 'test-client-secret');
+        // Set up test configuration
+        config()->set('services.wso2is.base_url', 'https://test.wso2is.com');
+        config()->set('services.wso2is.client_id', 'test-client-id');
+        config()->set('services.wso2is.client_secret', 'test-client-secret');
     }
 }

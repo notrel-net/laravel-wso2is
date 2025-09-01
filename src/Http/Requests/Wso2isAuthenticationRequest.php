@@ -29,12 +29,12 @@ class Wso2isAuthenticationRequest extends FormRequest
         $updateUsing ??= $this->updateUsing(...);
 
         // Exchange authorization code for tokens
-        $tokenResponse = Http::asForm()->post(config('wso2is.base_url') . '/oauth2/token', [
+        $tokenResponse = Http::asForm()->post(config('services.wso2is.base_url') . '/oauth2/token', [
             'grant_type' => 'authorization_code',
-            'client_id' => config('wso2is.client_id'),
-            'client_secret' => config('wso2is.client_secret'),
+            'client_id' => config('services.wso2is.client_id'),
+            'client_secret' => config('services.wso2is.client_secret'),
             'code' => $this->query('code'),
-            'redirect_uri' => config('wso2is.redirect_uri'),
+            'redirect_uri' => config('services.wso2is.redirect_uri'),
         ]);
 
         if (! $tokenResponse->successful()) {
