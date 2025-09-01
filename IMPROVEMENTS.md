@@ -27,6 +27,7 @@ Add your WSO2IS configuration to `config/services.php`:
 - `Wso2isLoginRequest` - Handle login redirects with OIDC parameters
 - `Wso2isAuthenticationRequest` - Process OAuth2 callbacks
 - `Wso2isLogoutRequest` - Handle logout with SSO support
+- `Wso2isAccountDeletionRequest` - Handle account deletion from both WSO2IS and local database
 
 ### 4. **Enhanced User Model**
 - Role checking: `$user->hasRole('admin')`, `$user->hasAnyRole(['admin', 'editor'])`
@@ -77,6 +78,11 @@ Route::get('/auth/callback', function (Wso2isAuthenticationRequest $request) {
 // Logout
 Route::post('/logout', function (Wso2isLogoutRequest $request) {
     return $request->logout('/');
+});
+
+// Account Deletion
+Route::delete('/delete-account', function (Wso2isAccountDeletionRequest $request) {
+    return $request->deleteAccount(redirectTo: '/');
 });
 ```
 

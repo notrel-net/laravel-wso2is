@@ -63,6 +63,7 @@ The package provides convenient request classes similar to Laravel WorkOS. You c
 use Notrel\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
 use Notrel\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
 use Notrel\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isAccountDeletionRequest;
 
 Route::get('/auth/login', function (Wso2isLoginRequest $request) {
     return $request->redirect([
@@ -80,6 +81,10 @@ Route::get('/auth/callback', function (Wso2isAuthenticationRequest $request) {
 Route::post('/auth/logout', function (Wso2isLogoutRequest $request) {
     return $request->logout('/'); // Optional: redirect URL after logout
 })->name('auth.logout');
+
+Route::delete('/auth/delete-account', function (Wso2isAccountDeletionRequest $request) {
+    return $request->deleteAccount(redirectTo: '/'); // Optional: redirect URL after deletion
+})->name('auth.delete-account')->middleware('auth');
 ```
 
 #### 2. Or Create a Controller
@@ -93,6 +98,7 @@ namespace App\Http\Controllers;
 use Notrel\LaravelWso2is\Http\Requests\Wso2isLoginRequest;
 use Notrel\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
 use Notrel\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
+use Notrel\LaravelWso2is\Http\Requests\Wso2isAccountDeletionRequest;
 
 class AuthController extends Controller
 {
@@ -126,6 +132,15 @@ class AuthController extends Controller
     public function logout(Wso2isLogoutRequest $request)
     {
         return $request->logout('/');
+    }
+
+    public function deleteAccount(Wso2isAccountDeletionRequest $request)
+    {
+        return $request->deleteAccount(
+            // Optional: custom user deletion
+            deleteUsing: fn($user) => $user->delete(),
+            redirectTo: '/'
+        );
     }
 }
 ```
