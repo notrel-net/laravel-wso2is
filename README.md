@@ -500,7 +500,7 @@ Integration tests cover:
 - OAuth token acquisition and API access
 - OIDC-compliant authentication verification
 
-**Note**: User and Group management integration tests are currently disabled as they require additional OAuth scopes to be configured in your WSO2IS instance. Only authentication tests are enabled by default.
+**Note**: Integration tests require a properly configured WSO2IS instance with appropriate OAuth scopes. Copy `.env.integration.example` to `.env.integration` and configure your WSO2IS instance details. All tests (authentication, user management, and group management) are enabled.
 
 Tests automatically clean up created resources after each test.
 

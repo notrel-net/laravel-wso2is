@@ -220,4 +220,12 @@ class Client
     {
         $this->accessToken = null;
     }
+
+    /**
+     * Get authentication method being used (always OAuth2 Bearer)
+     */
+    public function getAuthMethod(): string
+    {
+        return 'oauth2_bearer';
+    }
 }

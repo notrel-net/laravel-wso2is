@@ -6,8 +6,28 @@ class UserManagementIntegrationTest extends IntegrationTestCase
 {
     protected function setUp(): void
     {
-        $this->markTestSkipped('UserManagementIntegrationTest is disabled - OAuth scopes need to be configured');
+        parent::setUp();
+        
+        // Skip if no management scopes are configured
+        if (!$this->hasManagementScopes()) {
+            $this->markTestSkipped('UserManagementIntegrationTest requires OAuth management scopes to be configured in WSO2IS');
+        }
     }
+
+    /**
+     * Check if management scopes are available
+     */
+    protected function hasManagementScopes(): bool
+    {
+        try {
+            // Try to list users to check if we have management permissions
+            $this->client->users()->list();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public function test_it_can_create_and_retrieve_user()
     {
         // Create a user
