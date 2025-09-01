@@ -4,6 +4,8 @@ namespace Notrel\LaravelWso2is;
 
 class User
 {
+    protected ?string $cachedFullName = null;
+
     public function __construct(
         public string $id,
         public ?string $firstName,
@@ -17,11 +19,11 @@ class User
     ) {}
 
     /**
-     * Get the user's full name.
+     * Get the user's full name (cached).
      */
     public function getFullName(): string
     {
-        return trim($this->firstName . ' ' . $this->lastName);
+        return $this->cachedFullName ??= trim(($this->firstName ?? '') . ' ' . ($this->lastName ?? ''));
     }
 
     /**
@@ -73,5 +75,29 @@ class User
             'organizationId' => $this->organizationId,
             'fullName' => $this->getFullName(),
         ];
+    }
+
+    /**
+     * Get user data as JSON string
+     */
+    public function toJson(int $options = 0): string
+    {
+        return json_encode($this->toArray(), $options);
+    }
+
+    /**
+     * Check if user has all the specified roles
+     */
+    public function hasAllRoles(array $roles): bool
+    {
+        return empty(array_diff($roles, $this->roles));
+    }
+
+    /**
+     * Check if user is in all the specified groups
+     */
+    public function inAllGroups(array $groups): bool
+    {
+        return empty(array_diff($groups, $this->groups));
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Notrel\LaravelWso2is\Http;
 
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Notrel\LaravelWso2is\Resources\User;
@@ -16,7 +14,6 @@ class Client
     protected string $clientId;
     protected string $clientSecret;
     protected ?string $accessToken = null;
-    protected ?string $wso2isVersion = null;
 
     protected ?User $users = null;
     protected ?Group $groups = null;
@@ -30,41 +27,22 @@ class Client
     }
 
     /**
-     * Get OAuth2 access token from WSO2IS (OIDC Compliant)
+     * Get OAuth2 access token with specified scopes (defaults to management scopes)
      */
-    public function getAccessToken(): string
+    public function getAccessToken(?array $scopes = null): string
     {
         if ($this->accessToken) {
             return $this->accessToken;
         }
 
-        // OIDC Compliant: Use Client Credentials Grant for machine-to-machine
-        $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode($this->clientId . ':' . $this->clientSecret),
-            'Content-Type' => 'application/x-www-form-urlencoded',
-            'Accept' => 'application/json'
-        ])
-            ->withoutVerifying(isset($_ENV['WSO2IS_SKIP_SSL_VERIFY']) && $_ENV['WSO2IS_SKIP_SSL_VERIFY'])
-            ->asForm()
-            ->post($this->baseUrl . '/oauth2/token', [
-                'grant_type' => 'client_credentials',
-                'scope' => implode(' ', [
-                    'internal_user_mgt_create',
-                    'internal_user_mgt_list',
-                    'internal_user_mgt_view',
-                    'internal_user_mgt_update',
-                    'internal_user_mgt_delete',
-                    'internal_group_mgt_create',
-                    'internal_group_mgt_list',
-                    'internal_group_mgt_view',
-                    'internal_group_mgt_update',
-                    'internal_group_mgt_delete',
-                    'internal_application_mgt_create',
-                    'internal_application_mgt_view',
-                    'internal_application_mgt_update',
-                    'internal_application_mgt_delete'
-                ])
-            ]);
+        $scopes = $scopes ?? $this->getManagementScopes();
+
+        $response = Http::asForm()->post($this->baseUrl . '/oauth2/token', [
+            'grant_type' => 'client_credentials',
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
+            'scope' => implode(' ', $scopes),
+        ]);
 
         if ($response->failed()) {
             throw new RequestException($response);
@@ -77,22 +55,73 @@ class Client
     }
 
     /**
-     * Make authenticated request to WSO2IS API (OIDC Compliant)
+     * Get management scopes for admin operations
      */
-    public function request(string $method, string $endpoint, array $data = []): array
+    protected function getManagementScopes(): array
     {
-        // Use OAuth2 bearer token (OIDC Compliant)
-        $token = $this->getAccessToken();
+        return config('services.wso2is.management_scopes', [
+            'internal_user_mgt_create',
+            'internal_user_mgt_list',
+            'internal_user_mgt_view',
+            'internal_user_mgt_update',
+            'internal_user_mgt_delete',
+            'internal_group_mgt_create',
+            'internal_group_mgt_list',
+            'internal_group_mgt_view',
+            'internal_group_mgt_update',
+            'internal_group_mgt_delete',
+            'internal_application_mgt_create',
+            'internal_application_mgt_view',
+            'internal_application_mgt_update',
+            'internal_application_mgt_delete'
+        ]);
+    }
+
+    /**
+     * Get OIDC scopes for user authentication
+     */
+    protected function getOidcScopes(): array
+    {
+        return config('services.wso2is.scopes', ['openid', 'profile', 'email']);
+    }
+
+    /**
+     * Refresh an access token using the refresh token
+     */
+    public function refreshAccessToken(string $refreshToken): array
+    {
+        $response = Http::asForm()->post($this->baseUrl . '/oauth2/token', [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $refreshToken,
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
+        ]);
+
+        if (! $response->successful()) {
+            throw new RequestException($response);
+        }
+
+        $data = $response->json();
+
+        return [
+            $data['access_token'],
+            $data['refresh_token'] ?? $refreshToken, // Some flows might not return new refresh token
+        ];
+    }
+
+    /**
+     * Make authenticated request to WSO2IS API with specified scopes
+     */
+    public function request(string $method, string $endpoint, array $data = [], ?array $scopes = null): array
+    {
+        $token = $this->getAccessToken($scopes);
         $http = Http::withToken($token)
             ->withHeaders([
                 'Accept' => 'application/scim+json',
                 'Content-Type' => 'application/scim+json',
             ]);
 
-        // Add SSL verification bypass for development/testing
-        if (config('services.wso2is.skip_ssl_verify', false) || (isset($_ENV['WSO2IS_SKIP_SSL_VERIFY']) && $_ENV['WSO2IS_SKIP_SSL_VERIFY'])) {
-            $http = $http->withoutVerifying();
-        }
+        $this->configureSSLVerification($http);
 
         $response = match ($method) {
             'GET' => $http->get($this->baseUrl . $endpoint, $data),
@@ -112,8 +141,20 @@ class Client
             return [];
         }
 
-        $jsonData = $response->json();
-        return $jsonData ?? [];
+        return $response->json() ?? [];
+    }
+
+    /**
+     * Configure SSL verification for HTTP client
+     */
+    protected function configureSSLVerification($http): void
+    {
+        if (
+            config('services.wso2is.skip_ssl_verify', false) ||
+            (isset($_ENV['WSO2IS_SKIP_SSL_VERIFY']) && $_ENV['WSO2IS_SKIP_SSL_VERIFY'])
+        ) {
+            $http->withoutVerifying();
+        }
     }
 
     /**
@@ -153,11 +194,7 @@ class Client
      */
     public function users(): User
     {
-        if (!$this->users) {
-            $this->users = new User($this);
-        }
-
-        return $this->users;
+        return $this->users ??= new User($this);
     }
 
     /**
@@ -165,11 +202,7 @@ class Client
      */
     public function groups(): Group
     {
-        if (!$this->groups) {
-            $this->groups = new Group($this);
-        }
-
-        return $this->groups;
+        return $this->groups ??= new Group($this);
     }
 
     /**
@@ -177,18 +210,14 @@ class Client
      */
     public function applications(): Application
     {
-        if (!$this->applications) {
-            $this->applications = new Application($this);
-        }
-
-        return $this->applications;
+        return $this->applications ??= new Application($this);
     }
 
     /**
-     * Get authentication method being used (always OAuth2 Bearer)
+     * Reset cached access token (useful for testing or token refresh)
      */
-    public function getAuthMethod(): string
+    public function resetAccessToken(): void
     {
-        return 'oauth2_bearer';
+        $this->accessToken = null;
     }
 }

@@ -9,25 +9,27 @@ use Throwable;
 
 class Wso2is
 {
+    protected static ?\Notrel\LaravelWso2is\Http\Client $clientInstance = null;
+
+    /**
+     * Configuration keys required for WSO2IS
+     */
+    protected static array $requiredConfig = [
+        'services.wso2is.base_url',
+        'services.wso2is.client_id',
+        'services.wso2is.client_secret',
+        'services.wso2is.redirect_uri',
+    ];
+
     /**
      * Ensure WSO2IS is configured.
      */
     public static function configure(): void
     {
-        if (! config('services.wso2is.base_url')) {
-            throw new RuntimeException("The 'services.wso2is.base_url' configuration value is undefined.");
-        }
-
-        if (! config('services.wso2is.client_id')) {
-            throw new RuntimeException("The 'services.wso2is.client_id' configuration value is undefined.");
-        }
-
-        if (! config('services.wso2is.client_secret')) {
-            throw new RuntimeException("The 'services.wso2is.client_secret' configuration value is undefined.");
-        }
-
-        if (! config('services.wso2is.redirect_uri')) {
-            throw new RuntimeException("The 'services.wso2is.redirect_uri' configuration value is undefined.");
+        foreach (static::$requiredConfig as $key) {
+            if (! config($key)) {
+                throw new RuntimeException("The '{$key}' configuration value is undefined.");
+            }
         }
     }
 
@@ -67,23 +69,34 @@ class Wso2is
      */
     protected static function refreshAccessToken(string $refreshToken): array
     {
-        $response = Http::asForm()->post(config('services.wso2is.base_url') . '/oauth2/token', [
-            'grant_type' => 'refresh_token',
-            'refresh_token' => $refreshToken,
-            'client_id' => config('services.wso2is.client_id'),
-            'client_secret' => config('services.wso2is.client_secret'),
-        ]);
+        $client = static::client();
+        return $client->refreshAccessToken($refreshToken);
+    }
 
-        if (! $response->successful()) {
-            throw new RuntimeException('Failed to refresh access token.');
+    /**
+     * Get a configured HTTP client instance (cached)
+     */
+    public static function client(): \Notrel\LaravelWso2is\Http\Client
+    {
+        if (static::$clientInstance === null) {
+            static::configure();
+
+            static::$clientInstance = new \Notrel\LaravelWso2is\Http\Client(
+                config('services.wso2is.base_url'),
+                config('services.wso2is.client_id'),
+                config('services.wso2is.client_secret')
+            );
         }
 
-        $data = $response->json();
+        return static::$clientInstance;
+    }
 
-        return [
-            $data['access_token'],
-            $data['refresh_token'] ?? $refreshToken, // Some flows might not return new refresh token
-        ];
+    /**
+     * Reset the cached client instance (useful for testing)
+     */
+    public static function resetClient(): void
+    {
+        static::$clientInstance = null;
     }
 
     /**

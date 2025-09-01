@@ -35,6 +35,7 @@ class Wso2isAuthenticationRequest extends FormRequest
             'client_secret' => config('services.wso2is.client_secret'),
             'code' => $this->query('code'),
             'redirect_uri' => config('services.wso2is.redirect_uri'),
+            'scope' => implode(' ', config('services.wso2is.scopes', ['openid', 'profile', 'email'])),
         ]);
 
         if (! $tokenResponse->successful()) {

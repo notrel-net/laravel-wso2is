@@ -58,15 +58,7 @@ class User
      */
     public function getByUsername(string $username): array
     {
-        $response = $this->client->get('/scim2/Users', [
-            'filter' => "userName eq \"{$username}\""
-        ]);
-
-        if (empty($response['Resources'])) {
-            throw new \Exception("User with username '{$username}' not found");
-        }
-
-        return $response['Resources'][0];
+        return $this->findByFilter("userName eq \"{$username}\"", "username '{$username}'");
     }
 
     /**
@@ -74,12 +66,18 @@ class User
      */
     public function getByEmail(string $email): array
     {
-        $response = $this->client->get('/scim2/Users', [
-            'filter' => "emails eq \"{$email}\""
-        ]);
+        return $this->findByFilter("emails eq \"{$email}\"", "email '{$email}'");
+    }
+
+    /**
+     * Find resource by filter
+     */
+    protected function findByFilter(string $filter, string $description): array
+    {
+        $response = $this->client->get('/scim2/Users', ['filter' => $filter]);
 
         if (empty($response['Resources'])) {
-            throw new \Exception("User with email '{$email}' not found");
+            throw new \Exception("User with {$description} not found");
         }
 
         return $response['Resources'][0];

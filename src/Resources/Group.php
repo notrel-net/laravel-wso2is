@@ -59,14 +59,7 @@ class Group
     public function addUser(string $groupId, string $userId): array
     {
         $group = $this->get($groupId);
-
-        // Get user details for proper display name
-        try {
-            $user = $this->client->users()->get($userId);
-            $displayName = $user['userName'] ?? $userId;
-        } catch (\Exception $e) {
-            $displayName = $userId;
-        }
+        $displayName = $this->getUserDisplayName($userId);
 
         $members = $group['members'] ?? [];
         $members[] = [
@@ -113,5 +106,18 @@ class Group
         }
 
         return $response['Resources'][0];
+    }
+
+    /**
+     * Get user display name for group membership
+     */
+    protected function getUserDisplayName(string $userId): string
+    {
+        try {
+            $user = $this->client->users()->get($userId);
+            return $user['userName'] ?? $userId;
+        } catch (\Exception $e) {
+            return $userId;
+        }
     }
 }
