@@ -7,7 +7,8 @@ class GroupManagementIntegrationTest extends IntegrationTestCase
     public function test_it_can_create_and_retrieve_group()
     {
         $groupData = [
-            'displayName' => 'integration-test-group-' . time(),
+            'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+            'displayName' => 'IntegrationTestGroup' . time(), // WSO2IS 7.1 prefers no dashes
             'members' => []
         ];
 

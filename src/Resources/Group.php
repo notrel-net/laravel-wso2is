@@ -60,13 +60,23 @@ class Group
     {
         $group = $this->get($groupId);
 
+        // Get user details for proper display name
+        try {
+            $user = $this->client->users()->get($userId);
+            $displayName = $user['userName'] ?? $userId;
+        } catch (\Exception $e) {
+            $displayName = $userId;
+        }
+
         $members = $group['members'] ?? [];
         $members[] = [
             'value' => $userId,
-            'display' => $userId
+            'display' => $displayName
         ];
 
         return $this->update($groupId, [
+            'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+            'displayName' => $group['displayName'], // WSO2IS 7.1 requires displayName in updates
             'members' => $members
         ]);
     }
@@ -83,6 +93,8 @@ class Group
         });
 
         return $this->update($groupId, [
+            'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+            'displayName' => $group['displayName'], // WSO2IS 7.1 requires displayName in updates
             'members' => array_values($members)
         ]);
     }

@@ -8,6 +8,7 @@ class UserManagementIntegrationTest extends IntegrationTestCase
     {
         // Create a user
         $userData = [
+            'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
             'userName' => 'integration-test-user-' . time(),
             'name' => [
                 'givenName' => 'Integration',
@@ -19,7 +20,8 @@ class UserManagementIntegrationTest extends IntegrationTestCase
                     'primary' => true
                 ]
             ],
-            'password' => 'TestPassword123!'
+            'password' => 'TestPassword123!',
+            'active' => true
         ];
 
         $createdUser = $this->client->users()->create($userData);
@@ -40,8 +42,10 @@ class UserManagementIntegrationTest extends IntegrationTestCase
     {
         $user = $this->createTestUser();
 
-        // Update the user
+        // Update the user - WSO2IS 7.1 requires schemas and userName in update operations
         $updateData = [
+            'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
+            'userName' => $user['userName'], // Required in WSO2IS 7.1 updates
             'name' => [
                 'givenName' => 'Updated',
                 'familyName' => 'Name'

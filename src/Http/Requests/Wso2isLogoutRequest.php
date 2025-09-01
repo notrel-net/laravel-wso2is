@@ -37,6 +37,16 @@ class Wso2isLogoutRequest extends FormRequest
     }
 
     /**
+     * Get the logout URL for WSO2IS without performing logout.
+     * Useful for API responses, AJAX calls, or custom logout handling.
+     */
+    public function getRedirectUrl(?string $redirectTo = null): string
+    {
+        Wso2is::configure();
+        return $this->buildLogoutUrl($redirectTo);
+    }
+
+    /**
      * Build the logout URL for WSO2IS.
      */
     protected function buildLogoutUrl(?string $redirectTo = null): string

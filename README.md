@@ -372,10 +372,20 @@ use Notrel\LaravelWso2is\Http\Requests\Wso2isAuthenticationRequest;
 use Notrel\LaravelWso2is\Http\Requests\Wso2isLogoutRequest;
 
 // Initiate login
+// Option 1: Direct redirect (recommended for web apps)
 public function login()
 {
     $loginRequest = new Wso2isLoginRequest();
-    return redirect($loginRequest->getRedirectUrl());
+    return $loginRequest->redirect();
+}
+
+// Option 2: Get URL for custom handling (useful for APIs/AJAX)
+public function getLoginUrl()
+{
+    $loginRequest = new Wso2isLoginRequest();
+    return response()->json([
+        'login_url' => $loginRequest->getRedirectUrl()
+    ]);
 }
 
 // Handle callback
@@ -404,8 +414,11 @@ public function logout()
     auth()->logout();
     session()->flush();
     
-    // Redirect to WSO2IS logout
-    return redirect($logoutRequest->getRedirectUrl());
+    // Option 1: Direct redirect (recommended for web apps)
+    return $logoutRequest->redirect();
+    
+    // Option 2: Get URL for custom handling (useful for APIs/AJAX)
+    // return response()->json(['logout_url' => $logoutRequest->getRedirectUrl()]);
 }
 ```
 
@@ -480,14 +493,12 @@ composer test:all
 composer test:integration
 
 # Run specific integration test
-vendor/bin/phpunit --configuration phpunit.integration.xml --filter UserManagementIntegrationTest
+vendor/bin/phpunit --configuration phpunit.integration.xml --filter AuthenticationIntegrationTest
 ```
 
 Integration tests cover:
 - OAuth token acquisition and API access
-- User CRUD operations via SCIM2 API
-- Group management and membership
-- Search/filter operations
+- OIDC-compliant authentication verification
 - Error handling and edge cases
 
 Tests automatically clean up created resources after each test.

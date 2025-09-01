@@ -16,6 +16,7 @@ class Client
     protected string $clientId;
     protected string $clientSecret;
     protected ?string $accessToken = null;
+    protected ?string $wso2isVersion = null;
 
     protected ?User $users = null;
     protected ?Group $groups = null;
@@ -29,7 +30,7 @@ class Client
     }
 
     /**
-     * Get OAuth2 access token from WSO2IS
+     * Get OAuth2 access token from WSO2IS (OIDC Compliant)
      */
     public function getAccessToken(): string
     {
@@ -37,11 +38,33 @@ class Client
             return $this->accessToken;
         }
 
-        $response = Http::asForm()->post($this->baseUrl . '/oauth2/token', [
-            'grant_type' => 'client_credentials',
-            'client_id' => $this->clientId,
-            'client_secret' => $this->clientSecret,
-        ]);
+        // OIDC Compliant: Use Client Credentials Grant for machine-to-machine
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . base64_encode($this->clientId . ':' . $this->clientSecret),
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'Accept' => 'application/json'
+        ])
+            ->withoutVerifying(isset($_ENV['WSO2IS_SKIP_SSL_VERIFY']) && $_ENV['WSO2IS_SKIP_SSL_VERIFY'])
+            ->asForm()
+            ->post($this->baseUrl . '/oauth2/token', [
+                'grant_type' => 'client_credentials',
+                'scope' => implode(' ', [
+                    'internal_user_mgt_create',
+                    'internal_user_mgt_list',
+                    'internal_user_mgt_view',
+                    'internal_user_mgt_update',
+                    'internal_user_mgt_delete',
+                    'internal_group_mgt_create',
+                    'internal_group_mgt_list',
+                    'internal_group_mgt_view',
+                    'internal_group_mgt_update',
+                    'internal_group_mgt_delete',
+                    'internal_application_mgt_create',
+                    'internal_application_mgt_view',
+                    'internal_application_mgt_update',
+                    'internal_application_mgt_delete'
+                ])
+            ]);
 
         if ($response->failed()) {
             throw new RequestException($response);
@@ -54,13 +77,22 @@ class Client
     }
 
     /**
-     * Make authenticated request to WSO2IS API
+     * Make authenticated request to WSO2IS API (OIDC Compliant)
      */
     public function request(string $method, string $endpoint, array $data = []): array
     {
+        // Use OAuth2 bearer token (OIDC Compliant)
         $token = $this->getAccessToken();
+        $http = Http::withToken($token)
+            ->withHeaders([
+                'Accept' => 'application/scim+json',
+                'Content-Type' => 'application/scim+json',
+            ]);
 
-        $http = Http::withToken($token);
+        // Add SSL verification bypass for development/testing
+        if (config('services.wso2is.skip_ssl_verify', false) || (isset($_ENV['WSO2IS_SKIP_SSL_VERIFY']) && $_ENV['WSO2IS_SKIP_SSL_VERIFY'])) {
+            $http = $http->withoutVerifying();
+        }
 
         $response = match ($method) {
             'GET' => $http->get($this->baseUrl . $endpoint, $data),
@@ -74,7 +106,14 @@ class Client
             throw new RequestException($response);
         }
 
-        return $response->json();
+        // Handle empty responses (common in DELETE operations)
+        $body = $response->body();
+        if (empty($body)) {
+            return [];
+        }
+
+        $jsonData = $response->json();
+        return $jsonData ?? [];
     }
 
     /**
@@ -143,5 +182,13 @@ class Client
         }
 
         return $this->applications;
+    }
+
+    /**
+     * Get authentication method being used (always OAuth2 Bearer)
+     */
+    public function getAuthMethod(): string
+    {
+        return 'oauth2_bearer';
     }
 }

@@ -16,6 +16,9 @@ abstract class IntegrationTestCase extends TestCase
     {
         parent::setUp();
 
+        // Load environment variables from .env.integration if it exists
+        $this->loadIntegrationEnv();
+
         // Skip integration tests if no WSO2IS instance is configured
         if (!$this->hasWso2isConfig()) {
             $this->markTestSkipped('WSO2IS integration tests require real instance configuration');
@@ -40,6 +43,35 @@ abstract class IntegrationTestCase extends TestCase
         return !empty($_ENV['WSO2IS_BASE_URL']) &&
             !empty($_ENV['WSO2IS_CLIENT_ID']) &&
             !empty($_ENV['WSO2IS_CLIENT_SECRET']);
+    }
+
+    protected function loadIntegrationEnv(): void
+    {
+        $envFile = __DIR__ . '/../../.env.integration';
+
+        if (file_exists($envFile)) {
+            $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+            foreach ($lines as $line) {
+                // Skip comments
+                if (strpos(trim($line), '#') === 0) {
+                    continue;
+                }
+
+                // Parse KEY=VALUE format
+                if (strpos($line, '=') !== false) {
+                    list($key, $value) = explode('=', $line, 2);
+                    $key = trim($key);
+                    $value = trim($value);
+
+                    // Remove quotes if present
+                    $value = trim($value, '"\'');
+
+                    $_ENV[$key] = $value;
+                    putenv("$key=$value");
+                }
+            }
+        }
     }
 
     protected function cleanupCreatedResources(): void
@@ -75,6 +107,7 @@ abstract class IntegrationTestCase extends TestCase
     protected function createTestUser(array $userData = []): array
     {
         $defaultData = [
+            'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:User'],
             'userName' => 'test-user-' . uniqid(),
             'name' => [
                 'givenName' => 'Test',
@@ -86,7 +119,8 @@ abstract class IntegrationTestCase extends TestCase
                     'primary' => true
                 ]
             ],
-            'password' => 'TestPassword123!'
+            'password' => 'TestPassword123!',
+            'active' => true
         ];
 
         $userData = array_merge($defaultData, $userData);
@@ -99,7 +133,8 @@ abstract class IntegrationTestCase extends TestCase
     protected function createTestGroup(array $groupData = []): array
     {
         $defaultData = [
-            'displayName' => 'test-group-' . uniqid(),
+            'schemas' => ['urn:ietf:params:scim:schemas:core:2.0:Group'],
+            'displayName' => 'TestGroup' . uniqid(), // WSO2IS 7.1 doesn't like dashes in group names
             'members' => []
         ];
 

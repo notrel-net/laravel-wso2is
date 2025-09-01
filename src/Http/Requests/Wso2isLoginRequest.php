@@ -70,4 +70,57 @@ class Wso2isLoginRequest extends FormRequest
             ? Inertia::location($url)
             : redirect($url);
     }
+
+    /**
+     * Get the redirect URL for WSO2IS authentication without performing redirect.
+     * Useful for API responses, AJAX calls, or custom redirect handling.
+     *
+     * @param  array{
+     *     prompt?: 'login'|'consent'|'select_account'|'none',
+     *     loginHint?: string,
+     *     domainHint?: string,
+     *     maxAge?: int,
+     *     acrValues?: string
+     * }  $options
+     */
+    public function getRedirectUrl(array $options = []): string
+    {
+        $state = [
+            'state' => Str::random(32),
+            'previous_url' => base64_encode(URL::previous()),
+            'nonce' => Str::random(32),
+        ];
+
+        $params = [
+            'response_type' => 'code',
+            'client_id' => config('services.wso2is.client_id'),
+            'redirect_uri' => config('services.wso2is.redirect_uri'),
+            'scope' => implode(' ', config('services.wso2is.scopes', ['openid', 'profile', 'email'])),
+            'state' => json_encode($state),
+            'nonce' => $state['nonce'],
+        ];
+
+        // Add optional parameters
+        if (isset($options['prompt'])) {
+            $params['prompt'] = $options['prompt'];
+        }
+
+        if (isset($options['loginHint'])) {
+            $params['login_hint'] = $options['loginHint'];
+        }
+
+        if (isset($options['domainHint'])) {
+            $params['domain_hint'] = $options['domainHint'];
+        }
+
+        if (isset($options['maxAge'])) {
+            $params['max_age'] = $options['maxAge'];
+        }
+
+        if (isset($options['acrValues'])) {
+            $params['acr_values'] = $options['acrValues'];
+        }
+
+        return config('services.wso2is.base_url') . '/oauth2/authorize?' . http_build_query($params);
+    }
 }
