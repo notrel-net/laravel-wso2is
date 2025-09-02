@@ -53,6 +53,11 @@ class Wso2isAuthenticationRequest extends FormRequest
             abort(400, 'Failed to retrieve user information.');
         }
 
+        // Require email for authentication
+        if (! $user->email) {
+            abort(400, 'User account must have an email address to authenticate.');
+        }
+
         $existingUser = $findUsing($user);
 
         if (! $existingUser) {
@@ -91,8 +96,8 @@ class Wso2isAuthenticationRequest extends FormRequest
     {
         /** @phpstan-ignore class.notFound */
         return AppUser::create([
-            'name' => $user->getFullName(),
-            'email' => $user->email,
+            'name' => $user->getFullName() ?: $user->username ?: $user->id,
+            'email' => $user->email, // ?: $user->username . '@unknown.local',
             'email_verified_at' => now(),
             'wso2is_id' => $user->id,
             'avatar' => $user->avatar ?? '',

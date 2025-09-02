@@ -10,7 +10,7 @@ class User
         public string $id,
         public ?string $firstName,
         public ?string $lastName,
-        public string $email,
+        public ?string $email,
         public ?string $username = null,
         public array $groups = [],
         public array $roles = [],

@@ -118,7 +118,7 @@ class Wso2is
                 id: $userData['sub'] ?? $userData['id'],
                 firstName: $userData['given_name'] ?? null,
                 lastName: $userData['family_name'] ?? null,
-                email: $userData['email'],
+                email: $userData['email'] ?? null,
                 username: $userData['username'] ?? $userData['preferred_username'] ?? null,
                 groups: $userData['groups'] ?? [],
                 roles: $userData['roles'] ?? [],
