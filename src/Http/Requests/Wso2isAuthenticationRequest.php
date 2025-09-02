@@ -110,7 +110,7 @@ class Wso2isAuthenticationRequest extends FormRequest
     protected function updateUsing(AppUser $user, User $userFromWso2is): AppUser
     {
         return tap($user)->update([
-            'name' => $user->getFullName() ?: $user->username ?: $user->id,
+            'name' => $userFromWso2is->getFullName() ?: $userFromWso2is->username ?: $userFromWso2is->id,
             'avatar' => $userFromWso2is->avatar ?? '',
         ]);
     }
